@@ -32,10 +32,9 @@ config.watch = {
 
 config.tradingAdvisor = {
   enabled: true,
-  method: 'MACD',
-  candleSize: 1,
-  historySize: 3,
-  adapter: 'sqlite'
+  method: 'buyatsellat',
+  candleSize: 60,
+  historySize: 2
 }
 
 // Exponential Moving Averages settings:
