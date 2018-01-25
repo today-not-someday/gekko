@@ -33,8 +33,8 @@ config.watch = {
 config.tradingAdvisor = {
   enabled: true,
   method: 'buyatsellat',
-  candleSize: 60,
-  historySize: 2
+  candleSize: 5,
+  historySize: 10
 }
 
 // Exponential Moving Averages settings:
