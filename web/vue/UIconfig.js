@@ -11,7 +11,7 @@ const CONFIG = {
     timeout: 120000 // 2 minutes
   },
   ui: {
-    ssl: false,
+    ssl: true,
     host: 'localhost',
     port: 3000,
     path: '/'
