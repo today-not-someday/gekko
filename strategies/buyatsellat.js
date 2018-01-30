@@ -24,7 +24,11 @@ var method = {};
           readFile()
         }
         // success case, the file was saved
-        else console.log('Creating first time!');
+        else {
+          console.log('Creating first time!');
+          this.previousAction = 'sell';
+          this.previousActionPrice = Infinity
+      }
     });
     var action = fs.readFileSync("2pac.txt").toString()
     var splited = action.split(" ");
@@ -72,7 +76,7 @@ function writeToFile(previousAction, previousActionPrice)
 {
   var content = previousAction + " " + previousActionPrice
   fs.writeFileSync('2pac.txt', content, { flag: 'w' }, (err) => {  
-        console.log('Lyric saved!');
+        console.log('File Update after Buy SELL Action!');
     });
 
 }
@@ -98,6 +102,7 @@ method.check = function(candle) {
       this.advice('short');
       this.previousAction = 'sell';
       this.previousActionPrice = candle.close;
+      this.cancelLastOrder(() => this.order);
       writeToFile(this.previousAction, this.previousActionPrice)
     }
   }

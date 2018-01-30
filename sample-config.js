@@ -32,8 +32,8 @@ config.watch = {
 
 config.tradingAdvisor = {
   enabled: true,
-  method: 'buyatsellat',
-  candleSize: 1,
+  method: 'RSIv2',
+  candleSize: 5,
   historySize: 1
 }
 
@@ -185,7 +185,7 @@ config['talib-macd'] = {
 
 // do you want Gekko to simulate the profit of the strategy's own advice?
 config.paperTrader = {
-  enabled: false,
+  enabled: true,
   // report the profit in the currency or the asset?
   reportInCurrency: true,
   // start balance, on what the current balance is compared with
@@ -211,9 +211,9 @@ config.performanceAnalyzer = {
 // Enabling this will activate trades for the market being
 // watched by `config.watch`.
 config.trader = {
-  enabled: true,
-  key: '',
-  secret: '',
+  enabled: false,
+  key: 'RvKjDD1TEStkepPdUCKARLHBzLZTut0EIICujDD4vSCycI0SB7FgGaEdgPoLUT9A',
+  secret: 'UuYHXMsEQiQYiYGakykotIdMBUiRfOIAe3fcEY62tmU2SP7el97vNsK0I3RJEN73',
   username: '', // your username, only required for specific exchanges.
   passphrase: '', // GDAX, requires a passphrase.
   orderUpdateDelay: 1, // Number of minutes to adjust unfilled order prices
@@ -304,8 +304,8 @@ config.ircbot = {
 config.telegrambot = {
   enabled: false,
   emitUpdates: false,
-  token: 'YOUR_TELEGRAM_BOT_TOKEN',
-  botName: 'gekkobot'
+  token: 'AAFKgTUNFi6we01xFoJ9utgAT7YhH2qlYl8',
+  botName: 'kapil_gekko_trade_bot'
 }
 
 config.twitter = {
@@ -461,6 +461,6 @@ config.importer = {
 // understand this.
 //
 // Not sure? Read this first: https://github.com/askmike/gekko/issues/201
-config['I understand that Gekko only automates MY OWN trading strategies'] = true;
+config['I understand that Gekko only automates MY OWN trading strategies'] = false;
 
 module.exports = config;

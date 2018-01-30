@@ -42,13 +42,29 @@ Trader.prototype.processAdvice = function(advice) {
       'Buying ', config.trader.asset
     );
     this.manager.trade('BUY');
-  } else if(advice.recommendation == 'short') {
+  }
+  else if(advice.recommendation == 'cancel') {
+    log.info(
+      'Trader',
+      'Received advice to go cancel order.',
+      'Cancelling ', config.trader.asset
+    );
+    this.manager.trade('CANCEL');
+  }
+   else if(advice.recommendation == 'short') {
     log.info(
       'Trader',
       'Received advice to go short.',
       'Selling ', config.trader.asset
     );
     this.manager.trade('SELL');
+  }else if(advice.recommendation == 'stoploss') {
+    log.info(
+      'Trader',
+      'Received advice to go short.',
+      'Selling ', config.trader.asset
+    );
+    this.manager.trade('STOPLOSS');
   }
 }
 

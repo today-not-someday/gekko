@@ -35,6 +35,12 @@ PaperTrader.prototype.relayTrade = function(advice) {
     action = 'sell';
   else if(what === 'long')
     action = 'buy';
+  else if(what === 'stoploss')
+    action = 'stoploss';  
+  else if(what === 'cancel') {
+    console.log('This is my Geeko cancel!!')
+    action = 'cancel';  
+  }
   else
     return;
 
@@ -78,10 +84,9 @@ PaperTrader.prototype.updatePosition = function(advice) {
     this.portfolio.currency = 0;
     this.trades++;
   }
-
   // virtually trade all {currency} to {asset}
   // at the current price (minus fees)
-  else if(what === 'short') {
+  else if(what === 'stoploss') {
     this.portfolio.currency += this.extractFee(this.portfolio.asset * price);
     this.portfolio.asset = 0;
     this.trades++;

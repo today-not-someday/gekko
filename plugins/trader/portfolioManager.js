@@ -155,18 +155,39 @@ Manager.prototype.trade = function(what, retry) {
     var amount, price;
 
     if(what === 'BUY') {
-
+     log.info('Lets buy from portfolio manager');
+      console.log('BUYBUYBUYBUYBUYBUYBUYBUYBUY');
       amount = this.getBalance(this.currency) / this.ticker.ask;
       if(amount > 0){
           price = this.ticker.bid;
           this.buy(amount, price);
       }
-    } else if(what === 'SELL') {
-
+    }
+     else if(what === 'CANCEL') {
+      this.cancelLastOrder()
+      // amount = this.getBalance(this.asset) - this.keepAsset;
+      // if(amount > 0){
+      //     price = this.ticker.ask;
+      //     this.sell(amount, price);
+      // }
+    }
+     else if(what === 'SELL') {
+      console.log('SELLSELLSELLSELLSELLSELLSELLSELLSELLSELLSELL');
+      log.debug('Lets SELL from portfolio manager');
       amount = this.getBalance(this.asset) - this.keepAsset;
       if(amount > 0){
           price = this.ticker.ask;
           this.sell(amount, price);
+      }
+    }
+     else if(what === 'STOPLOSS') {
+      console.log('STOPLOSSSTOPLOSSSTOPLOSSSTOPLOSSSTOPLOSS');
+      log.debug('Lets STOPP LOSS from portfolio manager');
+      amount = this.getBalance(this.asset) - this.keepAsset;
+      if(amount > 0){
+          price = this.ticker.ask;
+          // Todo Chnage the variable name to stopLoss price
+          this.stopLoss(amount, price);
       }
     }
   };
@@ -264,6 +285,43 @@ Manager.prototype.sell = function(amount, price) {
     process(undefined, { amount: amount, price: price });
   }
 };
+Manager.prototype.stopLoss = function(amount, price) {
+  let minimum = 0;
+  let process = (err, order) => {
+    // if order to small
+    if (!order.amount || order.amount < minimum) {
+      return log.warn(
+        'Wanted to Stop lOSS',
+        this.currency,
+        'but the amount is too small ',
+        '(' + parseFloat(amount).toFixed(8) + ' @',
+        parseFloat(price).toFixed(8),
+        ') at',
+        this.exchange.name
+      );
+    }
+
+    log.info(
+      'Attempting to STOP LOSS',
+      order.amount,
+      this.asset,
+      'at',
+      this.exchange.name,
+      'price:',
+      order.price
+    );
+
+    this.exchange.stopLoss(order.amount, order.price, this.noteOrder);
+  }
+
+  if (_.has(this.exchange, 'getLotSize')) {
+    this.exchange.getLotSize('sell', amount, price, _.bind(process));
+  } else {
+    minimum = this.getMinimum(price);
+    process(undefined, { amount: amount, price: price });
+  }
+};
+
 
 Manager.prototype.noteOrder = function(err, order) {
   if(err) {

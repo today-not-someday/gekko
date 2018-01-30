@@ -234,15 +234,31 @@ Trader.prototype.addOrder = function(tradeType, amount, price, callback) {
     callback(undefined, txid);
   };
 
-  let reqData = {
-    symbol: this.pair,
-    side: tradeType.toUpperCase(),
-    type: 'LIMIT',
-    timeInForce: 'GTC', // Good to cancel (I think, not really covered in docs, but is default)
-    quantity: amount,
-    price: price,
-    timestamp: new Date().getTime()
-  };
+  if {
+    (tradeType === 'stoploss')
+    let reqData = {
+      symbol: this.pair,
+      side: tradeType.toUpperCase(),
+      type: 'STOP_LOSS',
+      timeInForce: 'GTC', // Good to cancel (I think, not really covered in docs, but is default)
+      quantity: amount,
+      // price: price,
+      // TODO: Need to introduce new variable
+      stopPrice: price, 
+      timestamp: new Date().getTime()
+    };
+  }
+  else {
+    let reqData = {
+      symbol: this.pair,
+      side: tradeType.toUpperCase(),
+      type: 'LIMIT',
+      timeInForce: 'GTC', // Good to cancel (I think, not really covered in docs, but is default)
+      quantity: amount,
+      price: price,
+      timestamp: new Date().getTime()
+    };
+  }
 
   let handler = (cb) => this.binance.newOrder(reqData, this.handleResponse('addOrder', cb));
   util.retryCustom(retryCritical, _.bind(handler, this), _.bind(setOrder, this));
@@ -275,6 +291,10 @@ Trader.prototype.buy = function(amount, price, callback) {
 
 Trader.prototype.sell = function(amount, price, callback) {
   this.addOrder('sell', amount, price, callback);
+};
+
+Trader.prototype.stopLoss = function(amount, price, callback) {
+  this.addOrder('stoploss', amount, price, callback);
 };
 
 Trader.prototype.checkOrder = function(order, callback) {

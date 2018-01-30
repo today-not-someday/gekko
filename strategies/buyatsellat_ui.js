@@ -4,6 +4,8 @@ var log = require('../core/log.js');
 
 var config = require('../core/util.js').getConfig();
 var settings = config.buyatsellat_ui;
+var queue = [];
+
 
 // let's create our own method
 var method = {};
@@ -12,7 +14,7 @@ var method = {};
   method.init = function() {
   this.name = 'buyatsellat_ui';
 
-  this.previousAction = 'sell';
+  this.previousAction = 'firstbuy';
   this.previousActionPrice = Infinity;
 }
 
@@ -26,40 +28,60 @@ method.update = function(candle) {
 method.log = function(candle) {
   //log.debug(this.previousAction)
 }
-
-method.check = function(candle) {  
-  const buyat = settings.buyat; // amount of percentage of difference required
-  const sellat = settings.sellat; // amount of percentage of difference required
+method.check = function(candle, canBuy) {  
   const stop_loss_pct = settings.stop_loss_pct; // amount of stop loss percentage
-  const sellat_up = settings.sellat_up; // amount of percentage from last buy if market goes up
+  const stopLossPrice= candle.close * stop_loss_pct;
+  const goodConditionToBuy = true;
 
-  if(this.previousAction === "buy") {
-    // calculate the minimum price in order to sell
-    const threshold = this.previousActionPrice * buyat;
+  queue.push(candle.close);
+  // console.log("Last 5 candles", queue);
 
-    // calculate the stop loss price in order to sell
-    const stop_loss = this.previousActionPrice * stop_loss_pct;
+  //1,2 ,3 , 4, 5, 6, 7,8 ,9 ,10
+  // Shift 5 times to keep only last 5.
+  if (queue.length == 5) {
+      queue.splice(1, 1)
+  }
+  
+  // We never sell here, we only update stop loss.
+  if(this.previousAction === "stoplossbuy") {
 
-    // we sell if the price is more than the required threshold or equals stop loss threshold
-    if((candle.close > threshold) || (candle.close < stop_loss)) {
-      this.advice('short');
-      this.previousAction = 'sell';
-      this.previousActionPrice = candle.close;
+    // 1. Update to new stop. loss. 
+    // Save the current candle.
+    // if the current candle is greater than the last saved candle
+    // now update new stop loss.For eg, last stop order price: 1000, candle.close: 1001
+
+
+    //this.previousAction = 'stoplosssell';
+
+
+
+    if (candle.close > lastCandlePrice)
+    {
+      // cancel last stop loss 
+      this.advice('cancel');
+      this.advice('stoploss');
+      this.previousStopLossPrice = stopLossPrice;
     }
+    // update last candle after all checks.
+    this.lastCandlePrice = candle.close
+
   }
 
-  else if(this.previousAction === "sell") {
-  // calculate the minimum price in order to buy
-    const threshold = this.previousActionPrice * sellat;
+  // Buy first or only after a stop loss if condition is good.
+  else if((this.previousAction === "stoplosssell") || this.previousAction === "firstbuy")  {
 
-  // calculate the price at which we should buy again if market goes up
-    const sellat_up_price = this.previousActionPrice * sellat_up;
-
-    // we buy if the price is less than the required threshold or greater than Market Up threshold
-    if((candle.close < threshold) || (candle.close > sellat_up_price)) {
+    // 2. When to buy?
+    // In good condition 
+    // goodConditionToBuy = [1,2,3,2,4] > out of 5 last values, 3 values, including the last candle are increasing.
+    
+    if(goodConditionToBuy) {
       this.advice('long');
-      this.previousAction = 'buy';
-      this.previousActionPrice = candle.close;
+      console.log("This is my first buy")
+      this.lastActionPrice = candle.close;
+      this.previousAction = 'buy'
+      console.log("This is my stoploss")
+      this.advice('stoplossbuy')
+      this.previousStopLossPrice = stopLossPrice;
     }
   }
 }

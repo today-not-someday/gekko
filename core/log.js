@@ -64,7 +64,7 @@ Log.prototype = {
   }
 }
 
-if(debug)
+if(true)
   Log.prototype.debug = function() {
     this._write('info', arguments, 'DEBUG');  
   }
